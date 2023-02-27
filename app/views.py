@@ -13,6 +13,7 @@ from app.forms import UploadForm
 ###
 # Routing for your application.
 ###
+UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', './upload')
 
 @app.route('/home')
 def home():
@@ -24,6 +25,13 @@ def home():
 def about():
     """Render the website's about page."""
     return render_template('about.html', name="Ashleigh Palmer")
+
+def get_uploaded_images():
+    images = []
+    for filename in os.listdir(UPLOAD_FOLDER):
+        if filename.endswith('.jpg') or filename.endswith('.png'):
+            images.append(filename)
+    return images
 
 
 @app.route('/upload', methods=['POST', 'GET'])
@@ -113,3 +121,10 @@ def add_header(response):
 def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
+
+
+@app.route('/files')
+def files():
+    """Render website's files page."""
+    images = get_uploaded_images()
+    return render_template('files.html', images=images)

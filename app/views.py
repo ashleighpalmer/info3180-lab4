@@ -37,27 +37,39 @@ def upload():
     return render_template('upload.html')
 
 
+from werkzeug.security import check_password_hash
+from app.forms import LoginForm
+from app.models import UserProfile
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     form = LoginForm()
 
-    # change this to actually validate the entire form submission
-    # and not just one field
-    if form.username.data:
+    if form.validate_on_submit():
         # Get the username and password values from the form.
+        username = form.username.data
+        password = form.password.data
 
         # Using your model, query database for a user based on the username
-        # and password submitted. Remember you need to compare the password hash.
-        # You will need to import the appropriate function to do so.
-        # Then store the result of that query to a `user` variable so it can be
-        # passed to the login_user() method below.
+        # submitted. Remember you need to compare the password hash.
+        user = UserProfile.query.filter_by(username=username).first()
 
-        # Gets user id, load into session
-        login_user(user)
+        if user:
+            # Check that the password entered matches that of the user
+            # using check_password_hash() function from werkzeug.security
+            if check_password_hash(user.password, password):
+                # Gets user id, load into session
+                login_user(user)
 
-        # Remember to flash a message to the user
-        return redirect(url_for("home"))  # The user should be redirected to the upload form instead
+                # Remember to flash a message to the user
+                flash('You have successfully logged in!', 'success')
+
+                return redirect(url_for("upload"))
+        
+        flash('Invalid username or password', 'danger')
+
     return render_template("login.html", form=form)
+
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session

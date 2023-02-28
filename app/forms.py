@@ -3,13 +3,15 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from werkzeug.utils import secure_filename
+from werkzeug.security import check_password_hash
+
 
 
 
 class LoginForm(FlaskForm):
-   file= username = StringField('Username', validators=[InputRequired()])
-   file=password = PasswordField('Password', validators=[InputRequired()])
-
+   username = StringField('Username', validators=[InputRequired()])
+   password = PasswordField('Password', validators=[InputRequired()])
+   submit = SubmitField('Sign In')
 
 
 class UploadForm(FlaskForm):
